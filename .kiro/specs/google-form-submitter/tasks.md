@@ -154,7 +154,7 @@
     - 測試 GetNextRunTime()
     - _Requirements: 7.1, 7.8_
 
-- [-] 13. Final Checkpoint - 確保所有功能正常
+- [X] 13. Final Checkpoint - 確保所有功能正常
   - 確保所有測試通過
   - 確保排程功能可正常運作
   - 如有問題請詢問使用者
