@@ -127,3 +127,59 @@ deployment/
 │   └── result.html
 └── data.db (執行後自動產生)
 ```
+
+## GitHub Releases 下載
+
+如果不想自行編譯，可以直接從 GitHub Releases 頁面下載預編譯版本。
+
+### 下載步驟
+
+1. 前往專案的 [Releases](../../releases) 頁面
+2. 選擇最新版本
+3. 根據你的作業系統下載對應的 ZIP 檔案：
+   - `google-form-submitter-darwin-amd64.zip` - macOS Intel
+   - `google-form-submitter-darwin-arm64.zip` - macOS Apple Silicon
+   - `google-form-submitter-windows-amd64.zip` - Windows 64-bit
+
+4. 解壓縮後，將 `config.json.example` 複製為 `config.json` 並修改設定
+
+### macOS 執行權限
+
+在 macOS 上下載後，需要賦予執行權限：
+```bash
+chmod +x google-form-submitter
+```
+
+如果遇到「無法打開，因為無法驗證開發者」的提示，可以：
+1. 右鍵點擊執行檔 → 打開
+2. 或在終端機執行：`xattr -d com.apple.quarantine google-form-submitter`
+
+## 發布新版本
+
+專案使用 GitHub Actions 自動化發布流程。
+
+### 發布步驟
+
+```bash
+# 1. 確保所有更改已提交
+git add .
+git commit -m "準備發布 v1.0.0"
+
+# 2. 建立版本標籤
+git tag -a v1.0.0 -m "Release version 1.0.0"
+
+# 3. 推送標籤到 GitHub
+git push origin v1.0.0
+```
+
+推送標籤後，GitHub Actions 會自動：
+1. 在 macOS 和 Windows 環境編譯程式
+2. 建立包含執行檔、設定範例和模板的 ZIP 檔案
+3. 建立 GitHub Release 並上傳所有檔案
+
+### 版本命名規則
+
+使用語義化版本號 (Semantic Versioning)：
+- `v1.0.0` - 正式版本
+- `v1.0.0-beta` - 測試版本
+- `v1.0.0-rc1` - 候選版本
