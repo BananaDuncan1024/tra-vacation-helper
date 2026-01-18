@@ -13,7 +13,7 @@ import (
 // SavedForm 儲存在 SQLite 中的表單資料記錄
 type SavedForm struct {
 	ID         int64     `json:"id"`
-	Label      string    `json:"label"`       // 識別標籤
+	Label      string    `json:"label"` // 識別標籤
 	Name       string    `json:"name"`
 	EmployeeID string    `json:"employee_id"`
 	StartDate  string    `json:"start_date"`
@@ -73,7 +73,6 @@ func NewStorage(dbPath string) (*Storage, error) {
 
 	return storage, nil
 }
-
 
 // initDB 初始化資料庫表格
 func (s *Storage) initDB() error {
@@ -153,7 +152,6 @@ func (s *Storage) GetByID(id int64) (*SavedForm, error) {
 
 	return form, nil
 }
-
 
 // List 列出所有儲存的表單資料
 func (s *Storage) List() ([]*SavedForm, error) {

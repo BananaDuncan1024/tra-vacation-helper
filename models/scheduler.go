@@ -55,7 +55,6 @@ func NewScheduler(cfg *ScheduleConfig, submitter *GoogleFormSubmitter, storage *
 	}
 }
 
-
 // Start 啟動排程器
 func (s *Scheduler) Start() error {
 	s.mu.Lock()
@@ -163,7 +162,6 @@ func (s *Scheduler) GetNextRunTime() time.Time {
 	return s.targetTime
 }
 
-
 // calculateTargetTime 計算目標時間（排程日期的 00:00:00）
 func (s *Scheduler) calculateTargetTime() time.Time {
 	return s.targetTime
@@ -251,7 +249,6 @@ func (s *Scheduler) executeWithPrecision() {
 		s.logger.Printf("提交成功，耗時: %v", time.Since(actualTime))
 	}
 }
-
 
 // submitWithRetry 帶重試的提交
 func (s *Scheduler) submitWithRetry(prepared *preparedRequest) error {

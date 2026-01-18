@@ -117,7 +117,6 @@ func (c *FormController) SubmitAPI(ctx *gin.Context) {
 	ctx.JSON(statusCode, result)
 }
 
-
 // SaveFormRequest 儲存表單請求結構
 type SaveFormRequest struct {
 	Label      string `json:"label" binding:"required"`

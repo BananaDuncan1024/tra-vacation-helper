@@ -51,7 +51,6 @@ func DefaultConfig() *Config {
 	}
 }
 
-
 // Load 從 config.json 載入配置，支援環境變數覆蓋
 func Load(configPath string) (*Config, error) {
 	cfg := DefaultConfig()
