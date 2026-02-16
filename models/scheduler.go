@@ -133,6 +133,28 @@ func (s *Scheduler) Start() error {
 	return nil
 }
 
+// StartWithConfig 使用新的配置啟動排程器（會先停止舊的排程）
+func (s *Scheduler) StartWithConfig(cfg *ScheduleConfig) error {
+	// 先停止現有排程
+	s.Stop()
+
+	// 重置 stopChan
+	s.mu.Lock()
+	s.stopChan = make(chan struct{})
+	s.mu.Unlock()
+
+	// 更新配置並啟動
+	s.config = cfg
+	return s.Start()
+}
+
+// GetConfig 取得當前排程配置
+func (s *Scheduler) GetConfig() *ScheduleConfig {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.config
+}
+
 // Stop 停止排程器
 func (s *Scheduler) Stop() {
 	s.mu.Lock()

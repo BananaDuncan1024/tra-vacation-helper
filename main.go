@@ -66,18 +66,17 @@ func main() {
 	// 初始化 GoogleFormSubmitter
 	submitter := models.NewGoogleFormSubmitter(cfg.FormURL, cfg.EntryMap)
 
-	// 初始化 Scheduler（如果啟用）
-	var scheduler *models.Scheduler
+	// 初始化 Scheduler（始終建立實例，以便排程管理頁面使用）
+	scheduleConfig := &models.ScheduleConfig{
+		Enabled:        cfg.Schedule.Enabled,
+		Date:           cfg.Schedule.Date,
+		SavedFormID:    cfg.Schedule.SavedFormID,
+		PrepareSeconds: cfg.Schedule.PrepareSeconds,
+		RetryCount:     cfg.Schedule.RetryCount,
+		RetryInterval:  cfg.Schedule.RetryInterval,
+	}
+	scheduler := models.NewScheduler(scheduleConfig, submitter, storage)
 	if cfg.Schedule.Enabled {
-		scheduleConfig := &models.ScheduleConfig{
-			Enabled:        cfg.Schedule.Enabled,
-			Date:           cfg.Schedule.Date,
-			SavedFormID:    cfg.Schedule.SavedFormID,
-			PrepareSeconds: cfg.Schedule.PrepareSeconds,
-			RetryCount:     cfg.Schedule.RetryCount,
-			RetryInterval:  cfg.Schedule.RetryInterval,
-		}
-		scheduler = models.NewScheduler(scheduleConfig, submitter, storage)
 		if err := scheduler.Start(); err != nil {
 			log.Printf("警告: 排程器啟動失敗: %v", err)
 		}
@@ -115,6 +114,13 @@ func main() {
 	// DELETE /api/saved/:id - 刪除已儲存的表單
 	router.DELETE("/api/saved/:id", formController.DeleteSavedForm)
 
+	// 排程管理路由
+	scheduleController := controllers.NewScheduleController(scheduler, storage)
+	router.GET("/schedule", scheduleController.ShowSchedule)
+	router.GET("/api/schedule", scheduleController.GetScheduleStatus)
+	router.POST("/api/schedule", scheduleController.CreateSchedule)
+	router.DELETE("/api/schedule", scheduleController.StopSchedule)
+
 	// 顯示啟動訊息
 	addr := fmt.Sprintf(":%s", cfg.Port)
 	fmt.Println("========================================")
@@ -124,7 +130,7 @@ func main() {
 	fmt.Printf("資料庫路徑: %s\n", cfg.DBPath)
 
 	// 顯示排程資訊
-	if cfg.Schedule.Enabled && scheduler != nil && scheduler.IsRunning() {
+	if cfg.Schedule.Enabled && scheduler.IsRunning() {
 		nextRun := scheduler.GetNextRunTime()
 		fmt.Println("----------------------------------------")
 		fmt.Println("排程功能: 已啟用")
