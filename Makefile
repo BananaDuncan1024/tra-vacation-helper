@@ -62,6 +62,8 @@ deps:
 build: $(BUILD_DIR) deps
 	@echo "$(COLOR_YELLOW)編譯 $(GOOS)/$(GOARCH) 版本...$(COLOR_RESET)"
 	CGO_ENABLED=1 $(GO) build $(GOFLAGS) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) .
+	@cp -f config.json $(BUILD_DIR)/config.json 2>/dev/null || true
+	@cp -rf views $(BUILD_DIR)/views 2>/dev/null || true
 	@echo "$(COLOR_GREEN)編譯完成: $(BUILD_DIR)/$(BINARY_NAME)$(COLOR_RESET)"
 
 # 編譯 macOS 版本 (需要在 macOS 上執行)

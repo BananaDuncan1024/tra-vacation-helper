@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"os/signal"
+	"path/filepath"
+	"runtime"
 	"syscall"
 
 	"github.com/gin-gonic/gin"
@@ -14,7 +17,37 @@ import (
 	"google-form-submitter/models"
 )
 
+// openBrowser 在預設瀏覽器中開啟指定 URL
+func openBrowser(url string) {
+	var cmd *exec.Cmd
+	switch runtime.GOOS {
+	case "darwin":
+		cmd = exec.Command("open", url)
+	case "linux":
+		cmd = exec.Command("xdg-open", url)
+	case "windows":
+		cmd = exec.Command("rundll32", "url.dll,FileProtocolHandler", url)
+	default:
+		log.Printf("無法自動開啟瀏覽器，請手動開啟: %s", url)
+		return
+	}
+	if err := cmd.Start(); err != nil {
+		log.Printf("開啟瀏覽器失敗: %v，請手動開啟: %s", err, url)
+	}
+}
+
 func main() {
+	// 切換工作目錄到執行檔所在目錄，確保直接點擊執行檔時能找到 config.json 等檔案
+	exePath, err := os.Executable()
+	if err != nil {
+		log.Fatalf("取得執行檔路徑失敗: %v", err)
+	}
+	exeDir := filepath.Dir(exePath)
+	if err := os.Chdir(exeDir); err != nil {
+		log.Fatalf("切換工作目錄失敗: %v", err)
+	}
+	fmt.Printf("工作目錄: %s\n", exeDir)
+
 	// 載入配置
 	cfg, err := config.Load("")
 	if err != nil {
@@ -119,6 +152,10 @@ func main() {
 			log.Fatalf("Server 啟動失敗: %v", err)
 		}
 	}()
+
+	// 自動在瀏覽器開啟 Server 頁面
+	serverURL := fmt.Sprintf("http://localhost%s", addr)
+	openBrowser(serverURL)
 
 	fmt.Println("Server 已啟動，按 Ctrl+C 停止...")
 
