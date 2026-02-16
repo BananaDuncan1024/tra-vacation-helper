@@ -7,10 +7,11 @@
 
 ## ✨ 功能特色
 
-- 🖥️ **網頁介面** - 簡潔的表單填寫頁面
+- 🖥️ **網頁介面** - 簡潔的表單填寫頁面，支援立即提交與保存資料
+- 📅 **排程管理** - 網頁 UI 即時管理排程，設定定時自動提交
 - 🔄 **API 支援** - RESTful API 可整合其他系統
-- 💾 **資料儲存** - SQLite 本地儲存，可預先保存表單資料
-- ⏰ **排程提交** - 支援定時自動提交（搶票/搶假專用）
+- 💾 **資料儲存** - SQLite 本地儲存，可預先保存表單資料供排程使用
+- ⏰ **精準排程** - 指定日期時間自動提交，適合搶票/搶假場景
 - 🔁 **自動重試** - 失敗時自動重試機制
 - 🖥️ **跨平台** - 支援 macOS (Intel/Apple Silicon) 和 Windows
 
@@ -32,7 +33,7 @@
 
 ### 2. 設定 config.json
 
-將 `config.json.example` 複製為 `config.json`，並填入你的 Google Form 資訊：
+編輯 `config.json`，填入你的 Google Form 資訊：
 
 ```json
 {
@@ -80,6 +81,30 @@ google-form-submitter.exe
 ### 4. 開啟瀏覽器
 
 存取 `http://localhost:8080` 即可使用網頁介面。
+
+## 🖥️ 網頁介面
+
+系統提供兩個主要頁面，透過頂部導航列切換：
+
+### 請假申請（`/`）
+
+填寫請假表單後，可選擇兩種操作：
+
+- **🚀 立即提交** - 直接提交到 Google Form
+- **💾 保存資料** - 儲存至本地資料庫，可在排程管理中選用
+
+### 排程管理（`/schedule`）
+
+- 查看目前排程狀態（是否啟用、目標時間、重試設定）
+- 選擇已保存的表單資料
+- 設定排程日期，系統將在該日 00:00:00 自動提交
+- 可隨時啟動或停止排程
+
+### 操作流程
+
+```
+填寫表單 → 保存資料 → 排程管理選擇資料 → 設定日期 → 到期自動提交
+```
 
 ## 📡 API 文件
 
@@ -133,36 +158,36 @@ GET /api/saved/:id
 DELETE /api/saved/:id
 ```
 
-## ⏰ 排程功能
+### 排程管理 API
 
-排程功能允許你在指定時間自動提交表單，適合搶票或搶假場景。
+| 方法 | 路徑 | 說明 |
+|------|------|------|
+| `GET` | `/api/schedule` | 取得排程狀態 |
+| `POST` | `/api/schedule` | 建立並啟動排程 |
+| `DELETE` | `/api/schedule` | 停止排程 |
 
-### 設定排程
+#### 建立排程
 
-1. 先使用 API 儲存表單資料，取得 `saved_form_id`
-2. 修改 `config.json` 中的 `schedule` 設定：
+```http
+POST /api/schedule
+Content-Type: application/json
 
-```json
 {
-  "schedule": {
-    "enabled": true,
-    "date": "2025-01-20T00:00:00",
-    "saved_form_id": 1,
-    "prepare_seconds": 5,
-    "retry_count": 3,
-    "retry_interval": 100
-  }
+  "date": "2025-01-20",
+  "saved_form_id": 1,
+  "prepare_seconds": 5,
+  "retry_count": 3,
+  "retry_interval": 100
 }
 ```
 
 | 參數 | 說明 |
 |------|------|
-| `enabled` | 是否啟用排程 |
-| `date` | 執行時間 (格式: `YYYY-MM-DDTHH:MM:SS`) |
+| `date` | 排程日期（到達 00:00:00 時自動提交） |
 | `saved_form_id` | 使用的儲存資料 ID |
-| `prepare_seconds` | 提前準備秒數 |
-| `retry_count` | 失敗重試次數 |
-| `retry_interval` | 重試間隔 (毫秒) |
+| `prepare_seconds` | 提前準備秒數（預設 5） |
+| `retry_count` | 失敗重試次數（預設 3） |
+| `retry_interval` | 重試間隔，毫秒（預設 100） |
 
 ## 🔧 從原始碼編譯
 
@@ -191,11 +216,17 @@ make test
 ├── config.json          # 設定檔
 ├── data.db              # SQLite 資料庫 (自動產生)
 ├── views/               # HTML 模板
-│   ├── index.html       # 表單頁面
+│   ├── index.html       # 請假申請頁面（立即提交 / 保存資料）
+│   ├── schedule.html    # 排程管理頁面
 │   └── result.html      # 結果頁面
 ├── config/              # 設定模組
 ├── controllers/         # 路由控制器
+│   ├── form_controller.go
+│   └── schedule_controller.go
 └── models/              # 資料模型
+    ├── leave_request.go
+    ├── storage.go
+    └── scheduler.go
 ```
 
 ## 📄 授權
