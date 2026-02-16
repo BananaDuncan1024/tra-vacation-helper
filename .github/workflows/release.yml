@@ -39,12 +39,21 @@ jobs:
           go build -v -ldflags "-s -w -X main.Version=${{ steps.version.outputs.VERSION }}" \
             -o dist/${{ env.APP_NAME }}-darwin-${{ matrix.goarch }} .
 
+      - name: Copy assets to build directory
+        run: |
+          mkdir -p build
+          cp dist/${{ env.APP_NAME }}-darwin-${{ matrix.goarch }} build/${{ env.APP_NAME }}
+          cp config.json build/config.json
+          cp -r views build/views
+          touch build/data.db
+
       - name: Create distribution package
         run: |
           mkdir -p package
           cp dist/${{ env.APP_NAME }}-darwin-${{ matrix.goarch }} package/${{ env.APP_NAME }}
-          cp config.json package/config.json.example
+          cp config.json package/config.json
           cp -r views package/
+          touch package/data.db
           cd package && zip -r ../${{ env.APP_NAME }}-darwin-${{ matrix.goarch }}.zip .
 
       - name: Upload artifact
@@ -80,13 +89,23 @@ jobs:
           go build -v -ldflags "-s -w -X main.Version=${{ steps.version.outputs.VERSION }}" `
             -o dist/${{ env.APP_NAME }}-windows-amd64.exe .
 
+      - name: Copy assets to build directory
+        shell: bash
+        run: |
+          mkdir -p build
+          cp dist/${{ env.APP_NAME }}-windows-amd64.exe build/${{ env.APP_NAME }}.exe
+          cp config.json build/config.json
+          cp -r views build/views
+          touch build/data.db
+
       - name: Create distribution package
         shell: bash
         run: |
           mkdir -p package
           cp dist/${{ env.APP_NAME }}-windows-amd64.exe package/${{ env.APP_NAME }}.exe
-          cp config.json package/config.json.example
+          cp config.json package/config.json
           cp -r views package/
+          touch package/data.db
           cd package && 7z a -tzip ../${{ env.APP_NAME }}-windows-amd64.zip .
 
       - name: Upload artifact
