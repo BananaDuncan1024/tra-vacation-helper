@@ -1,0 +1,79 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Gin Server",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/main.go",
+            "args": [
+                "-e",
+                "local"
+            ],
+            "env": {
+                "GIN_MODE": "debug",
+                "GO_ENV": "local"
+            },
+            "showLog": true,
+            "console": "integratedTerminal",
+            "buildFlags": "-tags=development",
+            "trace": "verbose",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Debug Gin Server (Staging)",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/main.go",
+            "args": [
+                "-e",
+                "staging"
+            ],
+            "env": {
+                "GIN_MODE": "debug",
+            },
+            "showLog": true,
+            "console": "integratedTerminal",
+            "buildFlags": "-tags=staging",
+            "trace": "verbose",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Attach to Go via Delve (Docker Air)",
+            "type": "go",
+            "request": "attach",
+            "mode": "remote",
+            "port": 2345, // Delve 监听的端口
+            "host": "127.0.0.1", // Docker 容器的 IP 地址，通常是 localhost
+            "showLog": true, // 显示 Delve 的日志
+            "trace": "verbose", // 更详细的日志
+            "remotePath": "/app" // 容器中你的 Go 项目的根目录
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Debug Both Services (API + Telemetry)",
+            "configurations": [
+                "Debug Gin Server",
+            ],
+            "stopAll": true,
+            "presentation": {
+                "hidden": false,
+                "group": "services"
+            }
+        },
+        {
+            "name": "Debug Both Services (Staging)",
+            "configurations": [
+                "Debug Gin Server (Staging)",
+            ],
+            "stopAll": true,
+            "presentation": {
+                "hidden": false,
+                "group": "services"
+            }
+        }
+    ]
+}

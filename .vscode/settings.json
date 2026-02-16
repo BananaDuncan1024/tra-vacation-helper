@@ -1,2 +1,51 @@
 {
+    "[go]": {
+        "editor.insertSpaces": false,
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        },
+        "editor.suggest.snippetsPreventQuickSuggestions": false,
+    },
+    "git.autofetch": true,
+    "[jsonc]": {
+        "editor.quickSuggestions": {
+            "strings": true
+        },
+        "editor.suggest.insertMode": "replace",
+        "editor.defaultFormatter": "vscode.json-language-features",
+        "editor.formatOnSave": true,
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4
+    },
+    "[markdown]": {
+        "editor.formatOnSave": true,
+        "editor.wordWrap": "on",
+        "editor.renderWhitespace": "all",
+        "editor.acceptSuggestionOnEnter": "off"
+    },
+    "[yaml]": {
+        "editor.formatOnSave": true,
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "editor.autoIndent": "keep",
+        "diffEditor.ignoreTrimWhitespace": false,
+        "editor.quickSuggestions": {
+            "other": true,
+            "comments": false,
+            "strings": true
+        }
+    },
+    "go.goroot": "${env:HOME}/.gvm/gos/go1.25.1",
+    "go.gopath": "${env:HOME}/.gvm/pkgsets/go1.25.1/global",
+    "go.toolsEnvVars": {},
+    "go.useLanguageServer": true,
+    "go.toolsManagement.autoUpdate": true,
+    // "terminal.integrated.automationProfile.osx": {
+    //   "path": "/bin/zsh",
+    //   "args": [
+    //     "-l",
+    //     "-i"
+    //   ]
+    // }
 }

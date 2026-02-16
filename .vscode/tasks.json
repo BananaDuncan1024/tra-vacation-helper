@@ -1,0 +1,108 @@
+{
+	// For more information, visit: https://go.microsoft.com/fwlink/?LinkId=733558
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "go: build dev",
+			"type": "shell",
+			"command": "go",
+			"args": [
+				"build",
+				"-tags=dev",
+				"-o",
+				"${workspaceFolder}/bin/dev",
+				"./main.go"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"reveal": "always",
+				"panel": "new"
+			},
+			"problemMatcher": [
+				"$go"
+			]
+		},
+		{
+			"label": "go: build staging",
+			"type": "shell",
+			"command": "go",
+			"args": [
+				"build",
+				"-tags=staging",
+				"-o",
+				"${workspaceFolder}/bin/staging",
+				"./main.go"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": "build",
+			"presentation": {
+				"reveal": "always",
+				"panel": "new"
+			},
+			"problemMatcher": [
+				"$go"
+			]
+		},
+		{
+			"label": "go: clean",
+			"type": "shell",
+			"command": "go",
+			"args": [
+				"clean"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"presentation": {
+				"reveal": "always",
+				"panel": "new"
+			}
+		},
+		{
+			"label": "start-api-server",
+			"type": "shell",
+			"command": "go",
+			"args": [
+				"run",
+				"./main.go",
+				"-e",
+				"local"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": "build",
+			"presentation": {
+				"reveal": "always",
+				"panel": "new",
+				"group": "services"
+			},
+			"isBackground": true,
+			"problemMatcher": [
+				{
+					"pattern": [
+						{
+							"regexp": ".",
+							"file": 1,
+							"location": 2,
+							"message": 3
+						}
+					],
+					"background": {
+						"activeOnStart": true,
+						"beginsPattern": ".",
+						"endsPattern": "."
+					}
+				}
+			]
+		}
+	]
+}
