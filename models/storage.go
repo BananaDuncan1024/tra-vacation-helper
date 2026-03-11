@@ -12,27 +12,29 @@ import (
 
 // SavedForm 儲存在 SQLite 中的表單資料記錄
 type SavedForm struct {
-	ID         int64     `json:"id"`
-	Label      string    `json:"label"` // 識別標籤
-	Name       string    `json:"name"`
-	EmployeeID string    `json:"employee_id"`
-	StartDate  string    `json:"start_date"`
-	EndDate    string    `json:"end_date"`
-	LeaveType  string    `json:"leave_type"`
-	Password   string    `json:"password"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
+	ID            int64     `json:"id"`
+	Label         string    `json:"label"` // 識別標籤
+	Name          string    `json:"name"`
+	EmployeeID    string    `json:"employee_id"`
+	LeaveCategory string    `json:"leave_category"`
+	LeaveType     string    `json:"leave_type"`
+	StartDate     string    `json:"start_date"`
+	EndDate       string    `json:"end_date"`
+	Password      string    `json:"password"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 // ToLeaveRequest 轉換為 LeaveRequest
 func (sf *SavedForm) ToLeaveRequest() *LeaveRequest {
 	return &LeaveRequest{
-		Name:       sf.Name,
-		EmployeeID: sf.EmployeeID,
-		StartDate:  sf.StartDate,
-		EndDate:    sf.EndDate,
-		LeaveType:  sf.LeaveType,
-		Password:   sf.Password,
+		Name:          sf.Name,
+		EmployeeID:    sf.EmployeeID,
+		LeaveCategory: sf.LeaveCategory,
+		LeaveType:     sf.LeaveType,
+		StartDate:     sf.StartDate,
+		EndDate:       sf.EndDate,
+		Password:      sf.Password,
 	}
 }
 
@@ -82,9 +84,10 @@ func (s *Storage) initDB() error {
 		label TEXT NOT NULL,
 		name TEXT NOT NULL,
 		employee_id TEXT NOT NULL,
+		leave_category TEXT NOT NULL DEFAULT '',
+		leave_type TEXT NOT NULL DEFAULT '',
 		start_date TEXT NOT NULL,
 		end_date TEXT NOT NULL,
-		leave_type TEXT NOT NULL,
 		password TEXT NOT NULL,
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -97,6 +100,9 @@ func (s *Storage) initDB() error {
 		return fmt.Errorf("初始化資料庫失敗: %w", err)
 	}
 
+	// 遷移：舊版資料庫可能缺少 leave_category 欄位，嘗試新增
+	_, _ = s.db.Exec(`ALTER TABLE saved_forms ADD COLUMN leave_category TEXT NOT NULL DEFAULT ''`)
+
 	return nil
 }
 
@@ -105,9 +111,9 @@ func (s *Storage) Save(form *SavedForm) (int64, error) {
 	now := time.Now()
 
 	result, err := s.db.Exec(`
-		INSERT INTO saved_forms (label, name, employee_id, start_date, end_date, leave_type, password, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-	`, form.Label, form.Name, form.EmployeeID, form.StartDate, form.EndDate, form.LeaveType, form.Password, now, now)
+		INSERT INTO saved_forms (label, name, employee_id, leave_category, leave_type, start_date, end_date, password, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	`, form.Label, form.Name, form.EmployeeID, form.LeaveCategory, form.LeaveType, form.StartDate, form.EndDate, form.Password, now, now)
 
 	if err != nil {
 		return 0, fmt.Errorf("資料儲存失敗: %w", err)
@@ -124,7 +130,7 @@ func (s *Storage) Save(form *SavedForm) (int64, error) {
 // GetByID 根據 ID 取得表單資料
 func (s *Storage) GetByID(id int64) (*SavedForm, error) {
 	row := s.db.QueryRow(`
-		SELECT id, label, name, employee_id, start_date, end_date, leave_type, password, created_at, updated_at
+		SELECT id, label, name, employee_id, leave_category, leave_type, start_date, end_date, password, created_at, updated_at
 		FROM saved_forms
 		WHERE id = ?
 	`, id)
@@ -135,9 +141,10 @@ func (s *Storage) GetByID(id int64) (*SavedForm, error) {
 		&form.Label,
 		&form.Name,
 		&form.EmployeeID,
+		&form.LeaveCategory,
+		&form.LeaveType,
 		&form.StartDate,
 		&form.EndDate,
-		&form.LeaveType,
 		&form.Password,
 		&form.CreatedAt,
 		&form.UpdatedAt,
@@ -156,7 +163,7 @@ func (s *Storage) GetByID(id int64) (*SavedForm, error) {
 // List 列出所有儲存的表單資料
 func (s *Storage) List() ([]*SavedForm, error) {
 	rows, err := s.db.Query(`
-		SELECT id, label, name, employee_id, start_date, end_date, leave_type, password, created_at, updated_at
+		SELECT id, label, name, employee_id, leave_category, leave_type, start_date, end_date, password, created_at, updated_at
 		FROM saved_forms
 		ORDER BY created_at DESC
 	`)
@@ -173,9 +180,10 @@ func (s *Storage) List() ([]*SavedForm, error) {
 			&form.Label,
 			&form.Name,
 			&form.EmployeeID,
+			&form.LeaveCategory,
+			&form.LeaveType,
 			&form.StartDate,
 			&form.EndDate,
-			&form.LeaveType,
 			&form.Password,
 			&form.CreatedAt,
 			&form.UpdatedAt,
@@ -218,9 +226,9 @@ func (s *Storage) Update(form *SavedForm) error {
 
 	result, err := s.db.Exec(`
 		UPDATE saved_forms
-		SET label = ?, name = ?, employee_id = ?, start_date = ?, end_date = ?, leave_type = ?, password = ?, updated_at = ?
+		SET label = ?, name = ?, employee_id = ?, leave_category = ?, leave_type = ?, start_date = ?, end_date = ?, password = ?, updated_at = ?
 		WHERE id = ?
-	`, form.Label, form.Name, form.EmployeeID, form.StartDate, form.EndDate, form.LeaveType, form.Password, now, form.ID)
+	`, form.Label, form.Name, form.EmployeeID, form.LeaveCategory, form.LeaveType, form.StartDate, form.EndDate, form.Password, now, form.ID)
 
 	if err != nil {
 		return fmt.Errorf("更新資料失敗: %w", err)

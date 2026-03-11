@@ -37,14 +37,21 @@ func (s *GoogleFormSubmitter) BuildFormData(req *LeaveRequest) url.Values {
 	if entryID, ok := s.EntryMap["employee_id"]; ok && entryID != "" {
 		data.Set(entryID, req.EmployeeID)
 	}
+	if entryID, ok := s.EntryMap["leave_category"]; ok && entryID != "" {
+		data.Set(entryID, req.LeaveCategory)
+	}
+	if entryID, ok := s.EntryMap["leave_type"]; ok && entryID != "" && req.LeaveType != "" {
+		data.Set(entryID, req.LeaveType)
+	}
 	if entryID, ok := s.EntryMap["start_date"]; ok && entryID != "" {
 		data.Set(entryID, req.StartDate)
 	}
 	if entryID, ok := s.EntryMap["end_date"]; ok && entryID != "" {
 		data.Set(entryID, req.EndDate)
 	}
-	if entryID, ok := s.EntryMap["leave_type"]; ok && entryID != "" {
-		data.Set(entryID, req.LeaveType)
+	// 第 8 題：請再次確認填寫內容正確（必須勾選「我確認了」）
+	if entryID, ok := s.EntryMap["confirmation"]; ok && entryID != "" {
+		data.Set(entryID, "我確認了")
 	}
 	if entryID, ok := s.EntryMap["password"]; ok && entryID != "" {
 		data.Set(entryID, req.Password)

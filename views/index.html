@@ -162,6 +162,52 @@
         .alert-success { background: #e6f4ea; color: #1e8e3e; border: 1px solid #ceead6; }
         .alert-error { background: #fce8e6; color: #c5221f; border: 1px solid #f5c6cb; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+        /* ===== Radio 按鈕組 ===== */
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .radio-group input[type="radio"] { display: none; }
+        .radio-group label {
+            display: inline-block;
+            padding: 8px 16px;
+            border: 1.5px solid #dadce0;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #5f6368;
+            background: white;
+            transition: all 0.15s;
+            margin-bottom: 0;
+        }
+        .radio-group input[type="radio"]:checked + label {
+            background: #1a73e8;
+            border-color: #1a73e8;
+            color: white;
+        }
+        .radio-group label:hover { border-color: #1a73e8; color: #1a73e8; }
+        .radio-group input[type="radio"]:checked + label:hover { color: white; }
+        /* ===== Checkbox ===== */
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px;
+            background: #fff8e1;
+            border: 1.5px solid #f9a825;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; cursor: pointer;
+        }
+        .checkbox-group span {
+            font-size: 14px; color: #5f3b00; line-height: 1.4;
+        }
+        /* ===== 提示 ===== */
         .hint {
             text-align: center;
             color: #80868b;
@@ -202,6 +248,44 @@
                 </div>
 
                 <div class="form-group">
+                    <label>近假/長假<span class="required">*</span></label>
+                    <div class="radio-group" id="leave_category_group">
+                        <input type="radio" name="leave_category" id="cat_近假" value="近假">
+                        <label for="cat_近假">近假</label>
+                        <input type="radio" name="leave_category" id="cat_長假" value="長假">
+                        <label for="cat_長假">長假</label>
+                        <input type="radio" name="leave_category" id="cat_長假號碼牌" value="長假號碼牌">
+                        <label for="cat_長假號碼牌">長假號碼牌</label>
+                        <input type="radio" name="leave_category" id="cat_取消" value="取消">
+                        <label for="cat_取消">取消</label>
+                    </div>
+                    <div class="error-message" id="leave_category-error">請選擇近假或長假</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="leave_type">假別</label>
+                    <select id="leave_type" name="leave_type">
+                        <option value="">選擇假別（可不選）</option>
+                        <option value="補休">補休</option>
+                        <option value="特休">特休</option>
+                        <option value="事假">事假</option>
+                        <option value="家庭照顧假">家庭照顧假</option>
+                        <option value="身心調適假">身心調適假</option>
+                        <option value="病假">病假</option>
+                        <option value="生理假">生理假</option>
+                        <option value="婚假">婚假</option>
+                        <option value="產前假">產前假</option>
+                        <option value="娩假">娩假</option>
+                        <option value="流產假">流產假</option>
+                        <option value="降產檢及降產假">降產檢及降產假</option>
+                        <option value="喪假">喪假</option>
+                        <option value="公假">公假</option>
+                        <option value="公出">公出</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label for="start_date">請假起點日期<span class="required">*</span></label>
                     <input type="date" id="start_date" name="start_date" required>
                     <div class="error-message" id="start_date-error">請選擇請假起點日期</div>
@@ -214,19 +298,18 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="leave_type">假別<span class="required">*</span></label>
-                    <select id="leave_type" name="leave_type" required>
-                        <option value="">請選擇假別</option>
-                        <option value="近假">近假</option>
-                        <option value="長假">長假</option>
-                    </select>
-                    <div class="error-message" id="leave_type-error">請選擇假別</div>
-                </div>
-
-                <div class="form-group">
                     <label for="password">請假密碼<span class="required">*</span></label>
                     <input type="password" id="password" name="password" placeholder="請輸入請假密碼" required>
                     <div class="error-message" id="password-error">請輸入請假密碼</div>
+                </div>
+
+                <div class="form-group">
+                    <label id="confirmation-label">確認填寫內咁<span class="required">*</span></label>
+                    <div class="checkbox-group" onclick="toggleConfirmation()">
+                        <input type="checkbox" id="confirmation" name="confirmation">
+                        <span>我確認了（請再次確認填寫內咁正確）</span>
+                    </div>
+                    <div class="error-message" id="confirmation-error">請勾選確認欄位才可提交</div>
                 </div>
 
                 <div class="btn-group">
@@ -239,7 +322,12 @@
     </div>
 
     <script>
-        const fields = ['name', 'employee_id', 'start_date', 'end_date', 'leave_type', 'password'];
+        const fields = ['name', 'employee_id', 'start_date', 'end_date', 'password'];
+
+        function toggleConfirmation() {
+            const cb = document.getElementById('confirmation');
+            cb.checked = !cb.checked;
+        }
 
         // ===== 工具 =====
         function showAlert(type, msg) {
@@ -253,10 +341,15 @@
 
         function validateForm() {
             let isValid = true;
+            // Clear text field errors
             fields.forEach(function(field) {
                 document.getElementById(field).classList.remove('error');
                 document.getElementById(field + '-error').classList.remove('show');
             });
+            document.getElementById('leave_category-error').classList.remove('show');
+            document.getElementById('confirmation-error').classList.remove('show');
+
+            // Validate text fields
             fields.forEach(function(field) {
                 const input = document.getElementById(field);
                 if (!input.value.trim()) {
@@ -265,6 +358,15 @@
                     isValid = false;
                 }
             });
+
+            // Validate leave_category radio
+            const catSelected = document.querySelector('input[name="leave_category"]:checked');
+            if (!catSelected) {
+                document.getElementById('leave_category-error').classList.add('show');
+                isValid = false;
+            }
+
+            // Validate date logic
             const startDate = document.getElementById('start_date').value;
             const endDate = document.getElementById('end_date').value;
             if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
@@ -274,16 +376,25 @@
                 errorEl.classList.add('show');
                 isValid = false;
             }
+
+            // Validate confirmation checkbox
+            if (!document.getElementById('confirmation').checked) {
+                document.getElementById('confirmation-error').classList.add('show');
+                isValid = false;
+            }
+
             return isValid;
         }
 
         function getFormData() {
+            const catEl = document.querySelector('input[name="leave_category"]:checked');
             return {
                 name: document.getElementById('name').value.trim(),
                 employee_id: document.getElementById('employee_id').value.trim(),
+                leave_category: catEl ? catEl.value : '',
+                leave_type: document.getElementById('leave_type').value,
                 start_date: document.getElementById('start_date').value,
                 end_date: document.getElementById('end_date').value,
-                leave_type: document.getElementById('leave_type').value,
                 password: document.getElementById('password').value.trim(),
             };
         }
@@ -327,7 +438,9 @@
 
             const formData = getFormData();
             // 建立識別標籤
-            formData.label = formData.name + ' - ' + formData.leave_type + ' (' + formData.start_date + ')';
+            formData.label = formData.name + ' - ' + (formData.leave_category || '') +
+                (formData.leave_type ? '/' + formData.leave_type : '') +
+                ' (' + formData.start_date + ')';
 
             try {
                 const resp = await fetch('/api/saved', {
@@ -350,11 +463,20 @@
         });
 
         // ===== 清除錯誤 =====
-        document.querySelectorAll('input, select').forEach(function(el) {
+        document.querySelectorAll('input[type="text"], input[type="date"], input[type="password"], select').forEach(function(el) {
             el.addEventListener('input', function() {
                 this.classList.remove('error');
-                document.getElementById(this.id + '-error').classList.remove('show');
+                const errEl = document.getElementById(this.id + '-error');
+                if (errEl) errEl.classList.remove('show');
             });
+        });
+        document.querySelectorAll('input[name="leave_category"]').forEach(function(el) {
+            el.addEventListener('change', function() {
+                document.getElementById('leave_category-error').classList.remove('show');
+            });
+        });
+        document.getElementById('confirmation').addEventListener('change', function() {
+            document.getElementById('confirmation-error').classList.remove('show');
         });
     </script>
 </body>

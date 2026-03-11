@@ -119,13 +119,14 @@ func (c *FormController) SubmitAPI(ctx *gin.Context) {
 
 // SaveFormRequest 儲存表單請求結構
 type SaveFormRequest struct {
-	Label      string `json:"label" binding:"required"`
-	Name       string `json:"name" binding:"required"`
-	EmployeeID string `json:"employee_id" binding:"required"`
-	StartDate  string `json:"start_date" binding:"required"`
-	EndDate    string `json:"end_date" binding:"required"`
-	LeaveType  string `json:"leave_type" binding:"required"`
-	Password   string `json:"password" binding:"required"`
+	Label         string `json:"label" binding:"required"`
+	Name          string `json:"name" binding:"required"`
+	EmployeeID    string `json:"employee_id" binding:"required"`
+	LeaveCategory string `json:"leave_category" binding:"required"`
+	LeaveType     string `json:"leave_type"`
+	StartDate     string `json:"start_date" binding:"required"`
+	EndDate       string `json:"end_date" binding:"required"`
+	Password      string `json:"password" binding:"required"`
 }
 
 // SaveFormResponse 儲存表單回應結構
@@ -170,13 +171,14 @@ func (c *FormController) SaveForm(ctx *gin.Context) {
 
 	// 建立 SavedForm
 	savedForm := &models.SavedForm{
-		Label:      req.Label,
-		Name:       req.Name,
-		EmployeeID: req.EmployeeID,
-		StartDate:  req.StartDate,
-		EndDate:    req.EndDate,
-		LeaveType:  req.LeaveType,
-		Password:   req.Password,
+		Label:         req.Label,
+		Name:          req.Name,
+		EmployeeID:    req.EmployeeID,
+		LeaveCategory: req.LeaveCategory,
+		LeaveType:     req.LeaveType,
+		StartDate:     req.StartDate,
+		EndDate:       req.EndDate,
+		Password:      req.Password,
 	}
 
 	// 儲存到資料庫

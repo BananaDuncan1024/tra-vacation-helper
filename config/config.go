@@ -32,12 +32,14 @@ func DefaultConfig() *Config {
 		Port:    "8080",
 		FormURL: "",
 		EntryMap: map[string]string{
-			"name":        "",
-			"employee_id": "",
-			"start_date":  "",
-			"end_date":    "",
-			"leave_type":  "",
-			"password":    "",
+			"name":          "",
+			"employee_id":   "",
+			"leave_category": "",
+			"leave_type":    "",
+			"start_date":    "",
+			"end_date":      "",
+			"confirmation":  "",
+			"password":      "",
 		},
 		DBPath: "data.db",
 		Schedule: ScheduleConfig{
@@ -130,7 +132,7 @@ func (c *Config) Validate() error {
 	}
 
 	// 檢查必要的 entry 欄位
-	requiredEntries := []string{"name", "employee_id", "start_date", "end_date", "leave_type", "password"}
+	requiredEntries := []string{"name", "employee_id", "leave_category", "start_date", "end_date", "confirmation", "password"}
 	for _, entry := range requiredEntries {
 		if c.EntryMap[entry] == "" {
 			return fmt.Errorf("配置錯誤: entry_map 缺少 %s 欄位", entry)

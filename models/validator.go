@@ -5,10 +5,12 @@ import (
 	"time"
 )
 
-// 允許的假別類型
-var allowedLeaveTypes = map[string]bool{
-	"近假": true,
-	"長假": true,
+// 允許的假別類型（6→3 欄位：近假/長假/長假號碼牌/取消）
+var allowedLeaveCategories = map[string]bool{
+	"近假":    true,
+	"長假":    true,
+	"長假號碼牌": true,
+	"取消":    true,
 }
 
 // ValidationError 驗證錯誤
@@ -30,14 +32,14 @@ func Validate(req *LeaveRequest) error {
 	if req.EmployeeID == "" {
 		return &ValidationError{Field: "employee_id", Message: "員工代號為必填欄位"}
 	}
+	if req.LeaveCategory == "" {
+		return &ValidationError{Field: "leave_category", Message: "請假類別為必填欄位"}
+	}
 	if req.StartDate == "" {
 		return &ValidationError{Field: "start_date", Message: "請假起點日期為必填欄位"}
 	}
 	if req.EndDate == "" {
 		return &ValidationError{Field: "end_date", Message: "請假終點日期為必填欄位"}
-	}
-	if req.LeaveType == "" {
-		return &ValidationError{Field: "leave_type", Message: "假別為必填欄位"}
 	}
 	if req.Password == "" {
 		return &ValidationError{Field: "password", Message: "請假密碼為必填欄位"}
@@ -59,9 +61,9 @@ func Validate(req *LeaveRequest) error {
 		return &ValidationError{Field: "end_date", Message: "請假終點日期不可早於起點日期"}
 	}
 
-	// 驗證假別
-	if !allowedLeaveTypes[req.LeaveType] {
-		return &ValidationError{Field: "leave_type", Message: "假別必須為「近假」或「長假」"}
+	// 驗證假別類別
+	if !allowedLeaveCategories[req.LeaveCategory] {
+		return &ValidationError{Field: "leave_category", Message: "假別類別必須為「近假」、「長假」、「長假號碼牌」或「取消」"}
 	}
 
 	return nil
